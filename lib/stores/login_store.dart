@@ -73,6 +73,5 @@ abstract class _LoginStoreBase with Store {
 
   void logout() {
     GetIt.I.get<UserManager>().removeUser();
-
   }
 }

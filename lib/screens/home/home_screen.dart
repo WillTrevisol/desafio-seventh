@@ -1,7 +1,9 @@
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
+import 'package:mobx/mobx.dart';
 
 import '../../stores/home_store.dart';
 import '../../stores/login_store.dart';
@@ -17,12 +19,32 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final UserManager userController = GetIt.I.get<UserManager>();
-  final HomeStore homeController = GetIt.I.get<HomeStore>();
+  final HomeStore homeController = HomeStore();
+
+  late ReactionDisposer reactionDisposer;
 
   @override
   void initState() {
     homeController.getVideo();
+    reactionDisposer = reaction(
+      (_) => GetIt.I.get<UserManager>().user == null, 
+      (_) => WidgetsBinding.instance.addPostFrameCallback(
+        (_) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const LoginScreen())
+          );
+        }
+      )
+    );
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    reactionDisposer.reaction.dispose();
+    homeController.videoPlayerController?.dispose();
+    homeController.flickManager?.dispose();
+    super.dispose();
   }
 
   @override
@@ -30,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.blue,
       appBar: AppBar(
-        title: Text('Olá ${userController.user?.userName}'),
+        title: Text('Olá ${userController.user?.userName ?? ''}'),
         elevation: 0,
         centerTitle: true,
         actions: <Widget> [
@@ -42,14 +64,16 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             }, 
             icon: const Icon(Icons.logout_outlined)
-          )
+          ),
         ],
       ),
       body: Observer(
         builder: (_) {
-          if (homeController.loading && homeController.flickManager == null) {
+          if (homeController.loading) {
             return const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
             );
           }
 
@@ -61,9 +85,9 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           }
 
-          return  Center(
+          return Center(
             child: AspectRatio(
-              aspectRatio: homeController.videoPlayerController!.value.aspectRatio,
+              aspectRatio: 1.77,
               child: FlickVideoPlayer(
                 flickManager: homeController.flickManager!,
               ),

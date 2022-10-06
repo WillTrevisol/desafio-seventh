@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import 'screens/login/login_screen.dart';
-import 'stores/home_store.dart';
 import 'stores/login_store.dart';
 import 'stores/user_manager_store.dart';
 
@@ -17,7 +16,6 @@ void main() async {
 void _setupInstances() {
   GetIt.I.registerSingleton(UserManager());
   GetIt.I.registerSingleton(LoginStore());
-  GetIt.I.registerSingleton(HomeStore());
 }
 
 Widget _getFirstPage() {

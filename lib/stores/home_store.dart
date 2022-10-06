@@ -1,8 +1,10 @@
 import 'package:flick_video_player/flick_video_player.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mobx/mobx.dart';
 import 'package:video_player/video_player.dart';
 
 import '../repository/video.dart';
+import 'login_store.dart';
 part 'home_store.g.dart';
 
 // ignore: library_private_types_in_public_api
@@ -35,6 +37,9 @@ abstract class _HomeStoreBase with Store {
   void setUrl(String value) => url = value;
 
   @action
+  void setVideoPlayerController(VideoPlayerController value) => videoPlayerController = value;
+
+  @action
   Future<void> getVideo() async {
     setLoading(true);
     setError(null);
@@ -45,13 +50,17 @@ abstract class _HomeStoreBase with Store {
       if (responseUrl != null) {
         setUrl(responseUrl);
 
-        videoPlayerController = VideoPlayerController.network(responseUrl);
+        flickManager = FlickManager(
+          videoPlayerController: VideoPlayerController.network(responseUrl)
+        );
 
-        flickManager = FlickManager(videoPlayerController: videoPlayerController!);
       }
 
     } catch (e) {
-      setError(e);
+      setError('Falha ao obter vídeo.');
+      if (e == 'Invalid token') {
+        GetIt.I.get<LoginStore>().logout();
+      }
     }
     setLoading(false);
   }

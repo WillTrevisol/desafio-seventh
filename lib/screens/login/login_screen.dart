@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../stores/login_store.dart';
+import '../../stores/user_manager_store.dart';
 import '../../widgets/custom_button.dart';
 import '../home/home_screen.dart';
 
@@ -110,9 +111,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: loginController.isFieldsFilled 
                       ? () async {
                         await loginController.login().then(
-                          (_) => Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (_) => const HomeScreen())
-                          ),
+                          (_) {
+                            if (GetIt.I.get<UserManager>().user != null) {
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(builder: (_) => const HomeScreen())
+                              );
+                            }
+                          } 
                         );
                       }
                       : null,

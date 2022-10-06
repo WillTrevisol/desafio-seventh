@@ -15,13 +15,13 @@ class VideoRepository {
         headers: Headers().defaultHeader(),
       );
 
-      if (response.statusCode == 200) {
-        final jsonDecoded = jsonDecode(response.body);
+      final jsonDecoded = jsonDecode(response.body);
 
+      if (response.statusCode == 200) {
         return jsonDecoded['url'];
       }
 
-      return Future.error('Falha ao obter video.');
+      return Future.error(jsonDecoded['message']);
 
     } catch (e) {
       return Future.error('Falha ao obter video.');
