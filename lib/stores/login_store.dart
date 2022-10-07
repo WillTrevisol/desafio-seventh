@@ -40,10 +40,10 @@ abstract class _LoginStoreBase with Store {
   }
 
   @action
-  void setUserName(String value) => userName = value;
+  void setUserName(String value) => userName = value.trim();
 
   @action
-  void setPassword(String value) => password = value;
+  void setPassword(String value) => password = value.trim();
 
   @action
   void setLoading(bool value) => loading = value;
